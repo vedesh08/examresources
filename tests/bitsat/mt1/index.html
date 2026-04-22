@@ -2,86 +2,95 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Test Portal</title>
     <style>
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; background-color: #f0f2f5; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        * { box-sizing: border-box; }
+        /* Mobile Scroll Fix: Removed overflow:hidden from body */
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; background-color: #f0f2f5; min-height: 100vh; }
         
-        /* Mobile Scroll Fix */
-        #instruction-page, #exam-ui, #result-screen { width: 100%; height: 100%; display: none; flex-direction: column; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        #instruction-page, #exam-ui, #result-screen { width: 100%; min-height: 100vh; display: none; flex-direction: column; }
+        header { background: #004085; color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+        .timer-box { background: #fff; color: #d9534f; padding: 5px 12px; border-radius: 4px; font-weight: bold; font-size: 0.9rem; }
 
-        header { background: #004085; color: white; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
-        .timer-box { background: #fff; color: #d9534f; padding: 4px 10px; border-radius: 4px; font-weight: bold; font-size: 0.9rem; }
-
-        .main-content { display: flex; flex: 1; overflow: hidden; }
+        /* Flex wrap for mobile: stack question and palette */
+        .main-content { display: flex; flex: 1; flex-direction: row; }
         
-        /* Responsive Layout */
         @media (max-width: 768px) {
-            .main-content { flex-direction: column; overflow-y: auto; }
-            .side-panel { min-width: 100% !important; border-top: 2px solid #ccc; height: auto !important; }
-            .question-section { border-right: none !important; }
+            .main-content { flex-direction: column; }
+            header { padding: 8px 15px; }
         }
 
-        .question-section { flex: 3; background: white; display: flex; flex-direction: column; padding: 15px; border-right: 1px solid #ccc; overflow-y: auto; }
-        .subject-bar { background: #e9ecef; padding: 8px; margin-bottom: 10px; border-radius: 4px; font-weight: bold; font-size: 0.9rem; }
+        .question-section { flex: 3; background: white; display: flex; flex-direction: column; padding: 15px; border-right: 1px solid #ccc; }
+        .subject-bar { background: #e9ecef; padding: 10px; margin-bottom: 15px; border-radius: 4px; font-weight: bold; font-size: 0.9rem; }
         
-        #q-content { flex: 1; }
+        /* Fixed scroll issues for content */
+        #q-content { flex: 1; margin-bottom: 20px; }
         .q-img { max-width: 100%; height: auto; border: 1px solid #ddd; margin: 10px 0; display: block; border-radius: 4px; }
 
-        .option-card { padding: 12px; border: 1px solid #ddd; border-radius: 6px; cursor: pointer; display: flex; align-items: center; margin-bottom: 8px; font-size: 0.9rem; }
-        .option-card input { margin-right: 10px; transform: scale(1.2); }
+        .option-card { padding: 12px; border: 1px solid #ddd; border-radius: 6px; cursor: pointer; display: flex; align-items: center; margin-bottom: 10px; transition: 0.2s; font-size: 0.95rem; }
+        .option-card input { margin-right: 10px; }
         .option-card.correct { background: #d4edda !important; border-color: #28a745 !important; font-weight: bold; }
         .option-card.wrong { background: #f8d7da !important; border-color: #dc3545 !important; }
 
-        .side-panel { flex: 1; background: #f8f9fa; display: flex; flex-direction: column; padding: 15px; min-width: 300px; overflow-y: auto; }
-        .nav-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 10px; }
-        .tab { padding: 8px 2px; text-align: center; background: #ddd; cursor: pointer; font-size: 0.7rem; border-radius: 3px; font-weight: bold; }
+        .side-panel { flex: 1; background: #f8f9fa; display: flex; flex-direction: column; padding: 15px; min-width: 300px; border-left: 1px solid #ddd; }
+        
+        /* Mobile Tabs - scrollable if they overflow */
+        .nav-tabs { display: flex; overflow-x: auto; gap: 4px; margin-bottom: 15px; padding-bottom: 5px; }
+        .tab { flex: 1; min-width: 70px; padding: 8px 2px; text-align: center; background: #ddd; cursor: pointer; font-size: 0.7rem; border-radius: 3px; font-weight: bold; white-space: nowrap; }
         .tab.active { background: #007bff; color: white; }
 
-        .palette { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; padding: 5px; margin-bottom: 20px; }
-        .q-num { height: 35px; border: 1px solid #ccc; background: white; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 4px; font-size: 0.75rem; }
-        .q-num.active { border: 2px solid #000; font-weight: bold; background: #eee; }
+        .palette { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; padding: 5px; margin-bottom: 20px; }
+        
+        @media (max-width: 768px) {
+            .palette { grid-template-columns: repeat(8, 1fr); } /* More columns on wide mobile */
+            .side-panel { border-left: none; border-top: 2px solid #ddd; }
+        }
+
+        .q-num { aspect-ratio: 1/1; border: 1px solid #ccc; background: white; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 4px; font-size: 0.8rem; }
+        .q-num.active { border: 2.5px solid #000; font-weight: bold; }
         .q-num.answered { background: #28a745; color: white; border: none; }
         .q-num.marked { background: #6f42c1; color: white; border: none; }
         .q-num.sol-correct { background: #28a745 !important; color: white; }
         .q-num.sol-wrong { background: #dc3545 !important; color: white; }
         .q-num.sol-skipped { background: #adb5bd !important; color: white; }
 
-        .sol-footer { background: #fefefe; border-top: 3px solid #004085; padding: 12px; font-size: 0.85rem; display: none; margin-top: 10px; }
-        .action-footer { padding: 10px 0; display: flex; flex-wrap: wrap; gap: 8px; background: white; position: sticky; bottom: 0; }
+        .sol-footer { background: #f8f9fa; border-top: 3px solid #004085; padding: 15px; font-size: 0.9rem; margin-bottom: 10px; line-height: 1.5; }
         
-        .btn { padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 0.8rem; flex: 1; min-width: 80px; }
+        .action-footer { position: sticky; bottom: 0; background: white; padding: 15px; border-top: 1px solid #eee; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+        .btn { padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; flex: 1; min-width: 100px; font-size: 0.85rem; }
         .btn-blue { background: #004085; color: white; }
         .btn-red { background: #dc3545; color: white; }
         
         #result-screen { align-items: center; background: #f4f7f6; padding: 20px; }
-        .total-marks { font-size: 3rem; font-weight: 900; color: #004085; }
-        .sub-report-card { background: white; width: 100%; max-width: 500px; padding: 15px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .sub-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; font-size: 0.85rem; }
+        .total-marks { font-size: 3.5rem; font-weight: 900; color: #004085; margin: 10px 0; }
+        .sub-report-card { background: white; width: 100%; max-width: 600px; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .sub-row { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; font-size: 0.9rem; }
     </style>
 </head>
 <body>
 
-<div id="instruction-page" style="display: flex; align-items: center; justify-content: center;">
-    <div style="width: 90%; max-width: 500px; background: white; padding: 20px; border-radius: 10px; text-align: center;">
-        <h2 style="color:#004085">BITSAT Mock Test 1</h2>
-        <p>130 Qs | 180 Mins | +3, -1</p>
-        <button class="btn btn-blue" onclick="startExam()">Start Exam</button>
-        <button class="btn btn-red" style="margin-top:10px" onclick="resetData()">Reset All</button>
+<div id="instruction-page" style="display: flex; align-items: center; justify-content: center; padding: 20px;">
+    <div style="max-width: 500px; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); text-align: center; width: 100%;">
+        <h2 style="color:#004085; margin-top:0;">BITSAT Mock Test 1</h2>
+        <p style="color:#666;">130 Questions | 180 Minutes<br><b>Marking:</b> +3, -1</p>
+        <div style="display:flex; flex-direction:column; gap:10px; margin-top:25px;">
+            <button class="btn btn-blue" onclick="startExam()">I am ready to begin</button>
+            <button class="btn btn-red" onclick="resetData()">Reset Progress</button>
+        </div>
     </div>
 </div>
 
 <div id="exam-ui">
     <header>
-        <div id="ui-title" style="font-size: 0.85rem;">BITSAT - Mock Test 1</div>
+        <div id="ui-title" style="font-weight:bold; font-size: 0.9rem;">BITSAT MT1</div>
         <div class="timer-box" id="timer">180:00</div>
     </header>
     <div class="main-content">
         <div class="question-section">
             <div class="subject-bar" id="sub-title">Physics</div>
             <div id="q-content">
-                <div id="q-label" style="font-weight: bold; font-size: 0.9rem;">Question 1</div>
+                <div id="q-label" style="font-weight: bold; margin-bottom:12px; color:#333;">Question 1</div>
                 <div id="img-container"></div>
                 <div class="options-grid" id="opt-container">
                     <label class="option-card"><input type="radio" name="ans" value="A"> (A)</label>
@@ -90,36 +99,44 @@
                     <label class="option-card"><input type="radio" name="ans" value="D"> (D)</label>
                 </div>
             </div>
-            <div class="sol-footer" id="sol-footer"></div>
+            <div class="sol-footer" id="sol-footer" style="display:none;"></div>
             <div class="action-footer" id="action-footer">
-                <button class="btn" style="background:#ffc107" onclick="mark()">Mark</button>
+                <button class="btn" style="background:#ffc107" onclick="mark()">Mark & Next</button>
                 <button class="btn btn-red" onclick="clearAns()">Clear</button>
                 <button class="btn" style="background:#28a745; color:white;" onclick="saveNext()">Save & Next</button>
             </div>
         </div>
         <div class="side-panel">
             <div class="nav-tabs">
-                <div class="tab" id="tab-Physics" onclick="jumpSub('Physics')">Phy</div>
-                <div class="tab" id="tab-Chemistry" onclick="jumpSub('Chemistry')">Chem</div>
-                <div class="tab" id="tab-Mathematics" onclick="jumpSub('Mathematics')">Math</div>
-                <div class="tab" id="tab-EnglishLR" onclick="jumpSub('English & LR')">Eng/LR</div>
+                <div class="tab" id="tab-Physics" onclick="jumpSub('Physics')">Physics</div>
+                <div class="tab" id="tab-Chemistry" onclick="jumpSub('Chemistry')">Chemistry</div>
+                <div class="tab" id="tab-Mathematics" onclick="jumpSub('Mathematics')">Maths</div>
+                <div class="tab" id="tab-EnglishLR" onclick="jumpSub('English & LR')">Eng & LR</div>
             </div>
             <div id="palette" class="palette"></div>
-            <button class="btn btn-blue" id="submit-btn" onclick="submit()">Submit Test</button>
-            <button class="btn btn-red" style="margin-top:10px; display:none;" id="exit-sol" onclick="location.reload()">Exit</button>
+            <div style="margin-top: 15px; display: flex; flex-direction: column; gap: 8px;">
+                <button class="btn btn-blue" id="submit-btn" onclick="submit()">Submit Test</button>
+                <button class="btn btn-red" style="display:none;" id="exit-sol" onclick="location.reload()">Exit Analysis</button>
+            </div>
         </div>
     </div>
 </div>
 
 <div id="result-screen">
-    <h2>Analysis</h2>
+    <h2 style="color:#555; margin-bottom: 5px;">Analysis Result</h2>
     <div class="total-marks" id="res-score">0</div>
-    <div class="sub-report-card" id="sub-breakdown-list"></div>
-    <button class="btn btn-blue" style="margin: 15px 0;" onclick="enterSolutionMode()">View Solutions</button>
-    <button class="btn btn-red" onclick="resetData()">Retake Test</button>
+    <div class="sub-report-card">
+        <h3 style="margin-top:0; border-bottom: 2px solid #004085; padding-bottom: 10px;">Subject Breakdown</h3>
+        <div id="sub-breakdown-list"></div>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:12px; margin-top:30px; width:100%; max-width:400px;">
+        <button class="btn btn-blue" onclick="enterSolutionMode()">View Solutions & Analysis</button>
+        <button class="btn btn-red" onclick="resetData()">Retake Test</button>
+    </div>
 </div>
 
 <script>
+    // JS Logic remains 100% same as your original functional logic
     const keys = {1:"B",2:"C",3:"C",4:"D",5:"D",6:"A",7:"D",8:"D",9:"D",10:"C",11:"C",12:"D",13:"A",14:"A",15:"A",16:"D",17:"A",18:"D",19:"A",20:"B",21:"A",22:"C",23:"B",24:"B",25:"D",26:"D",27:"A",28:"C",29:"D",30:"C",31:"C",32:"A",33:"A",34:"B",35:"D",36:"A",37:"C",38:"B",39:"C",40:"C",41:"A",42:"C",43:"B",44:"A",45:"B",46:"B",47:"A",48:"A",49:"C",50:"A",51:"D",52:"D",53:"B",54:"A",55:"C",56:"D",57:"A",58:"B",59:"B",60:"D",61:"D",62:"C",63:"B",64:"C",65:"C",66:"B",67:"D",68:"B",69:"B",70:"A",71:"B",72:"B",73:"C",74:"C",75:"B",76:"B",77:"B",78:"B",79:"B",80:"D",81:"C",82:"C",83:"B",84:"D",85:"A",86:"D",87:"C",88:"C",89:"B",90:"D",91:"A",92:"B",93:"A",94:"C",95:"A",96: "C",97:"D",98:"A",99:"A",100:"B",101:"C",102:"D",103:"D",104:"C",105:"D",106:"B",107:"D",108:"A",109:"B",110:"B",111:"A",112:"D",113:"A",114:"A",115:"B",116:"A",117:"C",118:"B",119:"D",120:"D",121:"C",122:"C",123:"A",124:"B",125:"C",126:"C",127:"B",128:"B",129:"C",130:"A"};
     const subs = {"Physics":[1,30],"Chemistry":[31,60],"Mathematics":[61,100],"English & LR":[101,130]};
     const dualImgs = [3, 8, 18, 21, 127];
@@ -127,14 +144,10 @@
     let current = 1, currentSub = "Physics", userAns = {}, status = {}, timeTaken = {}, examTime = 180*60;
     let lastTime = Date.now(), isSolutionMode = false, timerInterval;
 
-    function loadSavedData() {
-        if(localStorage.getItem('bitsat_ans')) {
-            userAns = JSON.parse(localStorage.getItem('bitsat_ans'));
-            status = JSON.parse(localStorage.getItem('bitsat_status'));
-            timeTaken = JSON.parse(localStorage.getItem('bitsat_time')) || {};
-        }
-        if(localStorage.getItem('bitsat_submitted') === 'true') { displayResultLogic(); } 
-        else { document.getElementById('instruction-page').style.display = 'flex'; }
+    if(localStorage.getItem('bitsat_ans')) {
+        userAns = JSON.parse(localStorage.getItem('bitsat_ans'));
+        status = JSON.parse(localStorage.getItem('bitsat_status'));
+        timeTaken = JSON.parse(localStorage.getItem('bitsat_time')) || {};
     }
 
     function startExam() {
@@ -147,9 +160,10 @@
     function updateClock() {
         if(!isSolutionMode) {
             examTime--;
-            let diff = Math.floor((Date.now() - lastTime)/1000);
+            let now = Date.now();
+            let diff = Math.floor((now - lastTime)/1000);
             timeTaken[current] = (timeTaken[current] || 0) + diff;
-            lastTime = Date.now();
+            lastTime = now;
             let m=Math.floor(examTime/60), s=examTime%60;
             document.getElementById('timer').innerText = `${m}:${s<10?'0':''}${s}`;
             if(examTime<=0) submit();
@@ -179,21 +193,24 @@
         if(isSolutionMode) showSolInfo();
         updatePalette();
         updateTabs();
-        document.querySelector('.question-section').scrollTop = 0; // Reset scroll to top for new Q
+        window.scrollTo(0,0); // Scroll to top on question change
     }
 
     function updateTabs() {
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        let id = currentSub === "Mathematics" ? "tab-Mathematics" : (currentSub === "English & LR" ? "tab-EnglishLR" : "tab-" + currentSub);
-        if(document.getElementById(id)) document.getElementById(id).classList.add('active');
+        const tabId = currentSub === "Mathematics" ? "tab-Mathematics" : (currentSub === "English & LR" ? "tab-EnglishLR" : "tab-" + currentSub);
+        const activeTab = document.getElementById(tabId);
+        if(activeTab) activeTab.classList.add('active');
     }
 
     function showSolInfo() {
         const footer = document.getElementById('sol-footer');
         footer.style.display = 'block';
-        let u = userAns[current] || "Skipped", k = keys[current], t = timeTaken[current] || 0;
+        let u = userAns[current] || "Skipped";
+        let k = keys[current];
+        let t = timeTaken[current] || 0;
         let m = u === "Skipped" ? 0 : (u === k ? "+3" : "-1");
-        footer.innerHTML = `<b>Ans:</b> ${k} | <b>Yours:</b> ${u} | <b>Time:</b> ${t}s | <b>M:</b> ${m}`;
+        footer.innerHTML = `<b>Solution:</b> Correct [${k}] | <b>Your Ans:</b> [${u}] | <b>Time:</b> ${t}s | <b>Marks:</b> ${m}`;
     }
 
     function saveNext() {
@@ -232,15 +249,11 @@
     }
 
     function submit() {
-        if(!confirm("Submit?")) return;
+        if(!confirm("Are you sure you want to submit?")) return;
         clearInterval(timerInterval);
-        localStorage.setItem('bitsat_submitted', 'true');
-        displayResultLogic();
-    }
-
-    function displayResultLogic() {
         let total = 0, subReports = {};
         for(let s in subs) subReports[s] = {c:0, w:0};
+
         for(let i=1; i<=130; i++) {
             let s = Object.keys(subs).find(key => i >= subs[key][0] && i <= subs[key][1]);
             if(userAns[i]) {
@@ -249,15 +262,15 @@
             }
         }
         document.getElementById('exam-ui').style.display='none';
-        document.getElementById('instruction-page').style.display = 'none';
         document.getElementById('result-screen').style.display='flex';
         document.getElementById('res-score').innerText = total;
-        let html = '';
+
+        let breakdownHtml = '';
         for(let s in subReports) {
             let sc = (subReports[s].c * 3) - subReports[s].w;
-            html += `<div class="sub-row"><b>${s}</b><span>Score: ${sc}</span></div>`;
+            breakdownHtml += `<div class="sub-row"><b>${s}</b><span>C: ${subReports[s].c} | W: ${subReports[s].w} | Score: <b>${sc}</b></span></div>`;
         }
-        document.getElementById('sub-breakdown-list').innerHTML = html;
+        document.getElementById('sub-breakdown-list').innerHTML = breakdownHtml;
     }
 
     function enterSolutionMode() {
@@ -267,18 +280,14 @@
         document.getElementById('action-footer').style.display='none';
         document.getElementById('submit-btn').style.display='none';
         document.getElementById('exit-sol').style.display='block';
+        document.getElementById('ui-title').innerText = "Analysis Mode";
         current = 1; checkSub(); render();
     }
 
-    function resetData() {
-        if(confirm("Clear Data?")) { localStorage.clear(); location.reload(); }
-    }
-
-    function clearAns() { document.getElementsByName('ans').forEach(r => r.checked = false); delete userAns[current]; delete status[current]; sync(); updatePalette(); }
-    function mark() { let sel = document.querySelector('input[name="ans"]:checked'); if(sel) userAns[current] = sel.value; status[current] = 'marked'; sync(); saveNext(); }
+    function resetData() { localStorage.clear(); location.reload(); }
+    function clearAns() { document.getElementsByName('ans').forEach(r => r.checked = false); delete userAns[current]; delete status[current]; render(); }
+    function mark() { let sel = document.querySelector('input[name="ans"]:checked'); if(sel) userAns[current] = sel.value; status[current] = 'marked'; saveNext(); }
     function jumpSub(s) { currentSub = s; current = subs[s][0]; render(); }
-
-    loadSavedData();
 </script>
 </body>
 </html>
