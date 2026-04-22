@@ -3,92 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test Portal</title>
+    <title>BITSAT Test Portal</title>
     <style>
         * { box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; background-color: #f0f2f5; min-height: 100vh; }
         
         #instruction-page, #exam-ui, #result-screen { width: 100%; min-height: 100vh; display: none; flex-direction: column; }
-        header { background: #004085; color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
-        .timer-box { background: #fff; color: #d9534f; padding: 5px 12px; border-radius: 4px; font-weight: bold; font-size: 0.9rem; }
+        header { background: #004085; color: white; padding: 8px 15px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+        .timer-box { background: #fff; color: #d9534f; padding: 4px 10px; border-radius: 4px; font-weight: bold; font-size: 0.9rem; }
 
         .main-content { display: flex; flex: 1; flex-direction: row; }
         @media (max-width: 768px) { .main-content { flex-direction: column; } }
 
         .question-section { flex: 3; background: white; display: flex; flex-direction: column; padding: 15px; border-right: 1px solid #ccc; }
-        .subject-bar { background: #e9ecef; padding: 10px; margin-bottom: 15px; border-radius: 4px; font-weight: bold; font-size: 0.9rem; }
-        #q-content { flex: 1; margin-bottom: 20px; }
+        .subject-bar { background: #e9ecef; padding: 8px; margin-bottom: 15px; border-radius: 4px; font-weight: bold; font-size: 0.85rem; }
+        #q-content { flex: 1; margin-bottom: 10px; }
         .q-img { max-width: 100%; height: auto; border: 1px solid #ddd; margin: 10px 0; display: block; border-radius: 4px; }
 
-        .option-card { padding: 12px; border: 1px solid #ddd; border-radius: 6px; cursor: pointer; display: flex; align-items: center; margin-bottom: 10px; transition: 0.2s; font-size: 0.95rem; }
-        .option-card.correct { background: #d4edda !important; border-color: #28a745 !important; }
-        .option-card.wrong { background: #f8d7da !important; border-color: #dc3545 !important; }
-
+        .option-card { padding: 10px; border: 1px solid #ddd; border-radius: 6px; cursor: pointer; display: flex; align-items: center; margin-bottom: 8px; font-size: 0.9rem; }
+        
         .side-panel { flex: 1; background: #f8f9fa; display: flex; flex-direction: column; padding: 15px; min-width: 300px; border-left: 1px solid #ddd; }
-        .nav-tabs { display: flex; overflow-x: auto; gap: 4px; margin-bottom: 15px; padding-bottom: 5px; }
-        .tab { flex: 1; min-width: 70px; padding: 8px 2px; text-align: center; background: #ddd; cursor: pointer; font-size: 0.7rem; border-radius: 3px; font-weight: bold; }
-        .tab.active { background: #007bff; color: white; }
-
-        /* Palette Styling */
-        .palette { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; padding: 5px; margin-bottom: 20px; }
+        .palette { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; padding: 5px; margin-bottom: 20px; }
         @media (max-width: 768px) { .palette { grid-template-columns: repeat(7, 1fr); } }
 
-        .q-num { 
-            width: 40px; height: 40px; border: 1px solid #ccc; background: white; 
-            display: flex; align-items: center; justify-content: center; 
-            cursor: pointer; border-radius: 4px; font-size: 0.8rem; position: relative;
-        }
+        .q-num { width: 38px; height: 38px; border: 1px solid #ccc; background: white; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 4px; font-size: 0.75rem; position: relative; }
         .q-num.active { border: 2.5px solid #000 !important; }
-        
-        /* Visited but not answered */
         .q-num.visited { background: #adb5bd; color: white; }
-        
-        /* Answered (Green Square) */
         .q-num.answered { background: #28a745; color: white; border: none; }
-        
-        /* Marked (Purple Circle) */
         .q-num.marked { background: #6f42c1; color: white; border-radius: 50%; border: none; }
-        
-        /* Answered and Marked (Purple Circle + Green Tick) */
-        .q-num.marked.has-ans::after {
-            content: '✔';
-            position: absolute;
-            bottom: -2px;
-            right: -2px;
-            background: #28a745;
-            color: white;
-            font-size: 8px;
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid white;
-        }
+        .q-num.marked.has-ans::after { content: '✔'; position: absolute; bottom: -2px; right: -2px; background: #28a745; color: white; font-size: 7px; width: 12px; height: 12px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid white; }
 
-        /* Result Palette Colors */
-        .q-num.sol-correct { background: #28a745 !important; color: white; border-radius: 4px; }
-        .q-num.sol-wrong { background: #dc3545 !important; color: white; border-radius: 4px; }
-        .q-num.sol-skipped { background: #adb5bd !important; color: white; border-radius: 4px; }
-
-        .action-footer { position: sticky; bottom: 0; background: white; padding: 15px; border-top: 1px solid #eee; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
-        .btn { padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; flex: 1; min-width: 100px; }
+        .action-footer { position: sticky; bottom: 0; background: white; padding: 10px; border-top: 1px solid #eee; display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+        .btn { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.8rem; }
         .btn-blue { background: #004085; color: white; }
         .btn-red { background: #dc3545; color: white; }
+        .btn-header { padding: 4px 10px; font-size: 0.75rem; background: #28a745; color: white; }
+
+        .ins-card { max-width: 700px; background: white; padding: 25px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .ins-list { text-align: left; font-size: 0.85rem; line-height: 1.6; color: #444; }
         
-        #result-screen { align-items: center; background: #f4f7f6; padding: 20px; }
-        .total-marks { font-size: 3.5rem; font-weight: 900; color: #004085; margin: 10px 0; }
-        .sub-report-card { background: white; width: 100%; max-width: 600px; padding: 20px; border-radius: 12px; }
+        #result-screen { align-items: center; background: #f4f7f6; padding: 20px; overflow-y: auto; }
+        .sub-report-card { background: white; width: 100%; max-width: 650px; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
     </style>
 </head>
 <body>
 
 <div id="instruction-page" style="display: flex; align-items: center; justify-content: center; padding: 20px;">
-    <div style="max-width: 500px; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); text-align: center; width: 100%;">
-        <h2 style="color:#004085">BITSAT Mock Test 1</h2>
-        <p>130 Questions | 180 Minutes | +3, -1</p>
-        <div style="display:flex; flex-direction:column; gap:10px; margin-top:25px;">
+    <div class="ins-card">
+        <h2 style="color:#004085; text-align:center; margin-top:0;">BITSAT Examination Instructions</h2>
+        <div class="ins-list">
+            <p><b>General Guidelines:</b></p>
+            <ul>
+                <li>Total Duration: <b>180 Minutes</b>.</li>
+                <li>The test consists of 4 sections: Physics (30), Chemistry (30), English & LR (30), and Mathematics (40).</li>
+                <li><b>Marking Scheme:</b> +3 for correct, -1 for incorrect, 0 for unattempted.</li>
+            </ul>
+            <p><b>Navigation Symbols:</b></p>
+            <ul>
+                <li><span style="color:#28a745">■</span> Answered | <span style="color:#adb5bd">■</span> Visited but unanswered</li>
+                <li><span style="border-radius:50%; background:#6f42c1; color:white; padding: 0 4px;">●</span> Marked for Review (Circle)</li>
+                <li><span style="border-radius:50%; background:#6f42c1; color:white; padding: 0 4px;">●</span>✔ Answered & Marked for Review</li>
+            </ul>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:10px; margin-top:20px;">
             <button class="btn btn-blue" onclick="startExam()">I am ready to begin</button>
             <button class="btn btn-red" onclick="resetData()">Reset Progress</button>
         </div>
@@ -97,52 +74,56 @@
 
 <div id="exam-ui">
     <header>
-        <div id="ui-title" style="font-weight:bold">BITSAT MT1</div>
+        <div style="display:flex; align-items:center; gap:15px;">
+            <span id="ui-title" style="font-weight:bold; font-size:0.9rem;">BITSAT 2026</span>
+            <button class="btn btn-header" id="submit-btn-header" onclick="submit()">SUBMIT</button>
+        </div>
         <div class="timer-box" id="timer">180:00</div>
     </header>
     <div class="main-content">
         <div class="question-section">
             <div class="subject-bar" id="sub-title">Physics</div>
             <div id="q-content">
-                <div id="q-label" style="font-weight: bold; margin-bottom:12px;">Question 1</div>
+                <div id="q-label" style="font-weight: bold; margin-bottom:10px;">Question 1</div>
                 <div id="img-container"></div>
-                <div class="options-grid" id="opt-container">
+                <div id="opt-container">
                     <label class="option-card"><input type="radio" name="ans" value="A"> (A)</label>
                     <label class="option-card"><input type="radio" name="ans" value="B"> (B)</label>
                     <label class="option-card"><input type="radio" name="ans" value="C"> (C)</label>
                     <label class="option-card"><input type="radio" name="ans" value="D"> (D)</label>
                 </div>
             </div>
-            <div class="sol-footer" id="sol-footer" style="display:none; background:#f8f9fa; padding:15px; border-top:3px solid #004085;"></div>
             <div class="action-footer" id="action-footer">
+                <button class="btn btn-blue" onclick="prevQ()">Previous</button>
                 <button class="btn" style="background:#ffc107" onclick="mark()">Mark & Next</button>
                 <button class="btn btn-red" onclick="clearAns()">Clear</button>
                 <button class="btn" style="background:#28a745; color:white;" onclick="saveNext()">Save & Next</button>
             </div>
         </div>
         <div class="side-panel">
-            <div class="nav-tabs">
-                <div class="tab" id="tab-Physics" onclick="jumpSub('Physics')">Physics</div>
-                <div class="tab" id="tab-Chemistry" onclick="jumpSub('Chemistry')">Chemistry</div>
-                <div class="tab" id="tab-Mathematics" onclick="jumpSub('Mathematics')">Maths</div>
-                <div class="tab" id="tab-EnglishLR" onclick="jumpSub('English & LR')">Eng & LR</div>
+            <div class="nav-tabs" style="display:flex; flex-wrap:wrap; gap:3px; margin-bottom:10px;">
+                <div class="tab" id="tab-Physics" onclick="jumpSub('Physics')" style="cursor:pointer; font-size:0.7rem; padding:5px; background:#ddd; border-radius:3px;">Phy</div>
+                <div class="tab" id="tab-Chemistry" onclick="jumpSub('Chemistry')" style="cursor:pointer; font-size:0.7rem; padding:5px; background:#ddd; border-radius:3px;">Chem</div>
+                <div class="tab" id="tab-Mathematics" onclick="jumpSub('Mathematics')" style="cursor:pointer; font-size:0.7rem; padding:5px; background:#ddd; border-radius:3px;">Math</div>
+                <div class="tab" id="tab-EnglishLR" onclick="jumpSub('English & LR')" style="cursor:pointer; font-size:0.7rem; padding:5px; background:#ddd; border-radius:3px;">Eng/LR</div>
             </div>
             <div id="palette" class="palette"></div>
-            <div style="margin-top: 15px; display: flex; flex-direction: column; gap: 8px;">
-                <button class="btn btn-blue" id="submit-btn" onclick="submit()">Submit Test</button>
-                <button class="btn btn-red" style="display:none;" id="exit-sol" onclick="location.reload()">Exit Analysis</button>
-            </div>
+            <button class="btn btn-red" style="display:none;" id="exit-sol" onclick="location.reload()">Exit Analysis</button>
         </div>
     </div>
 </div>
 
 <div id="result-screen">
-    <h2>Analysis Result</h2>
-    <div class="total-marks" id="res-score">0</div>
+    <h2 style="color:#004085; margin-bottom:5px;">Performance Analysis</h2>
+    <div style="font-size: 3rem; font-weight: 900; color:#004085;" id="res-score">0</div>
+    <div id="total-time-display" style="font-weight:bold; margin-bottom:20px; color:#555;">Total Time: 0m 0s</div>
+    
     <div class="sub-report-card">
+        <h3 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:10px;">Subject Details</h3>
         <div id="sub-breakdown-list"></div>
     </div>
-    <div style="display:flex; flex-direction:column; gap:12px; margin-top:30px; width:100%; max-width:400px;">
+    
+    <div style="display:flex; flex-direction:column; gap:10px; width:100%; max-width:400px;">
         <button class="btn btn-blue" onclick="enterSolutionMode()">View Solutions</button>
         <button class="btn btn-red" onclick="resetData()">Retake Test</button>
     </div>
@@ -153,8 +134,9 @@
     const subs = {"Physics":[1,30],"Chemistry":[31,60],"Mathematics":[61,100],"English & LR":[101,130]};
     const dualImgs = [3, 8, 18, 21, 127];
 
-    let current = 1, currentSub = "Physics", userAns = {}, status = {}, timeTaken = {}, examTime = 180*60;
-    let lastTime = Date.now(), isSolutionMode = false, timerInterval;
+    let current = 1, currentSub = "Physics", userAns = {}, status = {}, timeTaken = {};
+    let examTime = parseInt(localStorage.getItem('bitsat_timer')) || 180*60;
+    let isSolutionMode = false, timerInterval;
 
     if(localStorage.getItem('bitsat_ans')) {
         userAns = JSON.parse(localStorage.getItem('bitsat_ans'));
@@ -165,7 +147,7 @@
     function startExam() {
         document.getElementById('instruction-page').style.display = 'none';
         document.getElementById('exam-ui').style.display = 'flex';
-        if(!status[current]) status[current] = 'visited'; // Mark first ques as visited
+        if(!status[current]) status[current] = 'visited';
         render(); 
         timerInterval = setInterval(updateClock, 1000);
     }
@@ -173,12 +155,10 @@
     function updateClock() {
         if(!isSolutionMode) {
             examTime--;
-            let now = Date.now();
-            let diff = Math.floor((now - lastTime)/1000);
-            timeTaken[current] = (timeTaken[current] || 0) + diff;
-            lastTime = now;
+            timeTaken[current] = (timeTaken[current] || 0) + 1;
             let m=Math.floor(examTime/60), s=examTime%60;
             document.getElementById('timer').innerText = `${m}:${s<10?'0':''}${s}`;
+            localStorage.setItem('bitsat_timer', examTime);
             if(examTime<=0) submit();
             sync();
         }
@@ -188,83 +168,47 @@
         document.getElementById('sub-title').innerText = currentSub;
         document.getElementById('q-label').innerText = "Question " + current;
         const imgCont = document.getElementById('img-container');
-        imgCont.innerHTML = dualImgs.includes(current) ? 
-            `<img src="questions/${current}.1.png" class="q-img"><img src="questions/${current}.2.png" class="q-img">` :
-            `<img src="questions/${current}.png" class="q-img">`;
+        imgCont.innerHTML = dualImgs.includes(current) ? `<img src="questions/${current}.1.png" class="q-img"><img src="questions/${current}.2.png" class="q-img">` : `<img src="questions/${current}.png" class="q-img">`;
 
         let rds = document.getElementsByName('ans');
         rds.forEach(r => {
             r.checked = (userAns[current] === r.value);
             r.disabled = isSolutionMode;
-            let card = r.parentElement;
-            card.className = "option-card";
-            if(isSolutionMode) {
-                if(r.value === keys[current]) card.classList.add('correct');
-                else if(userAns[current] === r.value) card.classList.add('wrong');
-            }
         });
-        if(isSolutionMode) showSolInfo();
         updatePalette();
-        updateTabs();
         window.scrollTo(0,0);
-    }
-
-    function updateTabs() {
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        const tabId = currentSub === "Mathematics" ? "tab-Mathematics" : (currentSub === "English & LR" ? "tab-EnglishLR" : "tab-" + currentSub);
-        const activeTab = document.getElementById(tabId);
-        if(activeTab) activeTab.classList.add('active');
-    }
-
-    function showSolInfo() {
-        const footer = document.getElementById('sol-footer');
-        footer.style.display = 'block';
-        let u = userAns[current] || "Skipped";
-        let k = keys[current];
-        footer.innerHTML = `<b>Solution:</b> Correct [${k}] | <b>Marked:</b> [${u}]`;
     }
 
     function saveNext() {
         if(!isSolutionMode) {
             let sel = document.querySelector('input[name="ans"]:checked');
-            if(sel) { 
-                userAns[current] = sel.value; 
-                status[current] = 'answered'; 
-            } else if (status[current] !== 'marked') {
-                status[current] = 'visited';
-            }
+            if(sel) { userAns[current] = sel.value; status[current] = 'answered'; }
+            else if (status[current] !== 'marked') status[current] = 'visited';
             sync();
         }
         if(current < 130) { current++; checkSub(); if(!status[current]) status[current]='visited'; render(); }
     }
 
+    function prevQ() {
+        if(current > 1) { current--; checkSub(); render(); }
+    }
+
     function mark() {
         let sel = document.querySelector('input[name="ans"]:checked');
-        if(sel) {
-            userAns[current] = sel.value;
-            status[current] = 'marked'; // Will get 'has-ans' logic in palette
-        } else {
-            status[current] = 'marked';
-        }
+        if(sel) userAns[current] = sel.value;
+        status[current] = 'marked';
         sync();
         if(current < 130) { current++; checkSub(); if(!status[current]) status[current]='visited'; render(); }
     }
 
-    function clearAns() { 
-        document.getElementsByName('ans').forEach(r => r.checked = false); 
-        delete userAns[current]; 
-        status[current] = 'visited'; 
-        render(); 
-    }
+    function clearAns() { document.getElementsByName('ans').forEach(r => r.checked = false); delete userAns[current]; status[current] = 'visited'; render(); }
 
     function updatePalette() {
         let p = document.getElementById('palette'); p.innerHTML = '';
         let range = subs[currentSub];
         for(let i=range[0]; i<=range[1]; i++) {
             let d = document.createElement('div');
-            let s = status[i] || '';
-            let extraClass = '';
-            
+            let s = status[i] || '', extraClass = '';
             if(isSolutionMode) {
                 if(!userAns[i]) extraClass = " sol-skipped";
                 else if(userAns[i] === keys[i]) extraClass = " sol-correct";
@@ -275,15 +219,9 @@
                 else if(s === 'answered') extraClass = " answered";
                 else if(s === 'visited') extraClass = " visited";
             }
-
             d.className = `q-num ${i===current?'active':''} ${extraClass}`;
-            d.innerText = i; 
-            d.onclick = () => { 
-                current=i; 
-                if(!status[current]) status[current]='visited'; 
-                checkSub(); 
-                render(); 
-            };
+            d.innerText = i;
+            d.onclick = () => { current=i; if(!status[current]) status[current]='visited'; checkSub(); render(); };
             p.appendChild(d);
         }
     }
@@ -299,9 +237,13 @@
         if(!confirm("Submit Test?")) return;
         clearInterval(timerInterval);
         let total = 0, subReports = {};
-        for(let s in subs) subReports[s] = {c:0, w:0};
+        let totalSecs = 0;
+        for(let s in subs) subReports[s] = {c:0, w:0, time:0};
         for(let i=1; i<=130; i++) {
             let s = Object.keys(subs).find(key => i >= subs[key][0] && i <= subs[key][1]);
+            let qTime = timeTaken[i] || 0;
+            subReports[s].time += qTime;
+            totalSecs += qTime;
             if(userAns[i]) {
                 if(userAns[i] === keys[i]) { total += 3; subReports[s].c++; }
                 else { total -= 1; subReports[s].w++; }
@@ -310,10 +252,14 @@
         document.getElementById('exam-ui').style.display='none';
         document.getElementById('result-screen').style.display='flex';
         document.getElementById('res-score').innerText = total;
+        document.getElementById('total-time-display').innerText = `Total Time: ${Math.floor(totalSecs/60)}m ${totalSecs%60}s`;
+
         let breakdownHtml = '';
         for(let s in subReports) {
             let sc = (subReports[s].c * 3) - subReports[s].w;
-            breakdownHtml += `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee;"><b>${s}</b><span>Score: ${sc}</span></div>`;
+            let m = Math.floor(subReports[s].time/60);
+            breakdownHtml += `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee; font-size:0.9rem;">
+                <b>${s}</b><span>Score: ${sc} | Time: ${m}m</span></div>`;
         }
         document.getElementById('sub-breakdown-list').innerHTML = breakdownHtml;
     }
@@ -323,7 +269,7 @@
         document.getElementById('result-screen').style.display='none';
         document.getElementById('exam-ui').style.display='flex';
         document.getElementById('action-footer').style.display='none';
-        document.getElementById('submit-btn').style.display='none';
+        document.getElementById('submit-btn-header').style.display='none';
         document.getElementById('exit-sol').style.display='block';
         current = 1; checkSub(); render();
     }
