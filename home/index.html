@@ -51,7 +51,7 @@
             background-image: 
                 radial-gradient(at 10% 10%, rgba(0, 242, 254, 0.05) 0px, transparent 50%),
                 radial-gradient(at 90% 90%, rgba(79, 70, 229, 0.05) 0px, transparent 50%);
-            /* Background animation for extra sexiness */
+            /* Background animation */
             animation: bgAnimation 15s infinite alternate;
         }
 
@@ -194,7 +194,6 @@
             max-width: 700px;
         }
 
-        /* --- Grid & Sexy Cards --- */
         .exam-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -282,10 +281,17 @@
         .test-info h3 { font-size: 1.2rem; font-weight: 700; }
         .test-info p { color: var(--text-dim); font-size: 0.9rem; margin-top: 4px; }
 
+        .test-actions {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 8px;
+        }
+
         .start-btn {
             background: linear-gradient(135deg, var(--accent) 0%, #4f46e5 100%);
             color: #000;
-            padding: 12px 24px;
+            padding: 12px 30px;
             border-radius: 12px;
             text-decoration: none;
             font-weight: 700;
@@ -293,6 +299,7 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             box-shadow: 0 4px 15px var(--accent-glow);
+            text-align: center;
         }
 
         .start-btn:hover {
@@ -300,7 +307,22 @@
             transform: scale(1.05);
         }
 
-        /* --- Coming Soon (Sexy Typography) --- */
+        /* --- PDF Strip Style --- */
+        .pdf-strip {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            text-decoration: none;
+            border-bottom: 1px dashed var(--text-dim);
+            padding-bottom: 2px;
+            transition: 0.2s;
+        }
+
+        .pdf-strip:hover {
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        /* --- Coming Soon --- */
         .coming-soon-full {
             text-align: center;
             padding-top: 15vh;
@@ -401,7 +423,10 @@
                     <h3>BITSAT Mock Test 1</h3>
                     <p>Full Syllabus • 130 Questions • 180 Minutes</p>
                 </div>
-                <a href="https://examresources.vercel.app/tests/bitsat/mt1/" class="start-btn">Start</a>
+                <div class="test-actions">
+                    <a href="https://examresources.vercel.app/tests/bitsat/mt1/" class="start-btn">Start</a>
+                    <a href="https://examresources.vercel.app/tests/bitsat/mt1/testpdf.pdf" class="pdf-strip" target="_blank">Download Test PDF</a>
+                </div>
             </div>
         </div>
 
@@ -450,7 +475,7 @@
             showView('generic-soon');
         }
 
-        // --- Sexy Theme Logic ---
+        
         function toggleTheme() {
             const body = document.body;
             const checkbox = document.getElementById('checkbox');
