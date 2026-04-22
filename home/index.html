@@ -9,7 +9,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
-        /* --- Futuristic Theme Variables --- */
         :root {
             --bg: #050509;
             --sidebar-bg: rgba(10, 10, 20, 0.6); /* Translucent */
@@ -51,7 +50,7 @@
             background-image: 
                 radial-gradient(at 10% 10%, rgba(0, 242, 254, 0.05) 0px, transparent 50%),
                 radial-gradient(at 90% 90%, rgba(79, 70, 229, 0.05) 0px, transparent 50%);
-            /* Background animation */
+
             animation: bgAnimation 15s infinite alternate;
         }
 
@@ -60,7 +59,7 @@
             100% { background-position: 100% 100%; }
         }
 
-        /* --- Theme Toggle Switch --- */
+  
         .theme-switch-wrapper {
             position: absolute;
             top: 25px;
@@ -108,7 +107,7 @@
         input:checked + .slider { background-color: var(--accent); }
         input:checked + .slider:before { transform: translateX(22px); }
 
-        /* --- Sidebar (Glassmorphism) --- */
+
         .sidebar {
             width: 280px;
             background: var(--sidebar-bg);
@@ -159,7 +158,7 @@
             box-shadow: inset 0 0 15px rgba(0, 242, 254, 0.05);
         }
 
-        /* --- Main Content Area --- */
+
         .main-view {
             flex: 1;
             padding: 80px 50px 50px;
@@ -167,7 +166,7 @@
             position: relative;
         }
 
-        /* Fancy Scrollbar */
+
         .main-view::-webkit-scrollbar { width: 8px; }
         .main-view::-webkit-scrollbar-track { background: transparent; }
         .main-view::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
@@ -211,14 +210,14 @@
             overflow: hidden;
         }
 
-        /* Neon glow effect on hover */
+  
         .exam-card:hover {
             transform: translateY(-10px) scale(1.02);
             border-color: var(--accent);
             box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.5), 0 0 15px var(--accent-glow);
         }
 
-        /* Subtle shine reflection animation on hover */
+
         .exam-card::after {
             content: '';
             position: absolute;
@@ -253,7 +252,7 @@
 
         [data-theme="light"] .exam-card img { filter: none; }
 
-        /* --- BITSAT Listing (Premium Look) --- */
+  
         .test-list-item {
             background: var(--glass);
             padding: 25px;
@@ -307,7 +306,7 @@
             transform: scale(1.05);
         }
 
-        /* --- PDF Strip Style --- */
+
         .pdf-strip {
             font-size: 0.75rem;
             color: var(--text-dim);
@@ -322,7 +321,7 @@
             border-color: var(--accent);
         }
 
-        /* --- Coming Soon --- */
+
         .coming-soon-full {
             text-align: center;
             padding-top: 15vh;
@@ -454,13 +453,13 @@
     </div>
 
     <script>
-        // --- View Logic (Hover & Click stable) ---
+
         function showView(viewId) {
             document.querySelectorAll('.view-content').forEach(v => v.classList.remove('active'));
             const target = document.getElementById(viewId);
             if(target) target.classList.add('active');
 
-            // Set sidebar active state based on text matching
+
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.classList.remove('active');
                 const itemText = item.innerText.toLowerCase();
