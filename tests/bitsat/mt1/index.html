@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BITSAT Test Portal</title>
+    <title>Test Portal</title>
     <style>
         * { box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; background-color: #f0f2f5; height: 100vh; overflow: hidden; }
@@ -62,7 +62,7 @@
 
 <div id="exam-ui">
     <header>
-        <div id="ui-title" style="font-weight:bold">BITSAT MT1</div>
+        <div id="ui-title" style="font-weight:bold">BITSAT Online Portal</div>
         <div class="timer-box" id="timer">180:00</div>
     </header>
     <div class="main-content">
@@ -120,10 +120,18 @@
     let current = 1, currentSub = "Physics", userAns = {}, status = {}, timeTaken = {}, examTime = 180*60;
     let lastTime = Date.now(), isSolutionMode = false, timerInterval;
 
-    if(localStorage.getItem('bitsat_ans')) {
-        userAns = JSON.parse(localStorage.getItem('bitsat_ans'));
-        status = JSON.parse(localStorage.getItem('bitsat_status'));
-        timeTaken = JSON.parse(localStorage.getItem('bitsat_time')) || {};
+    function loadSavedData() {
+        if(localStorage.getItem('bitsat_ans')) {
+            userAns = JSON.parse(localStorage.getItem('bitsat_ans'));
+            status = JSON.parse(localStorage.getItem('bitsat_status'));
+            timeTaken = JSON.parse(localStorage.getItem('bitsat_time')) || {};
+        }
+        
+        if(localStorage.getItem('bitsat_submitted') === 'true') {
+            displayResultLogic(); 
+        } else {
+            document.getElementById('instruction-page').style.display = 'flex';
+        }
     }
 
     function startExam() {
@@ -185,7 +193,7 @@
         let k = keys[current];
         let t = timeTaken[current] || 0;
         let m = u === "Skipped" ? 0 : (u === k ? "+3" : "-1");
-        footer.innerHTML = `<b>Solution:</b> Correct Option [${k}] | <b>Marked:</b> [${u}] | <b>Time:</b> ${t}s | <b>Gained:</b> ${m} Marks`;
+        footer.innerHTML = `<b>Solution:</b> Correct [${k}] | <b>Marked:</b> [${u}] | <b>Time:</b> ${t}s | <b>Marks:</b> ${m}`;
     }
 
     function saveNext() {
@@ -224,8 +232,13 @@
     }
 
     function submit() {
-        if(!confirm("Are you sure you want to submit?")) return;
+        if(!confirm("Are you sure?")) return;
         clearInterval(timerInterval);
+        localStorage.setItem('bitsat_submitted', 'true');
+        displayResultLogic();
+    }
+
+    function displayResultLogic() {
         let total = 0, subReports = {};
         for(let s in subs) subReports[s] = {c:0, w:0};
 
@@ -237,6 +250,7 @@
             }
         }
         document.getElementById('exam-ui').style.display='none';
+        document.getElementById('instruction-page').style.display = 'none';
         document.getElementById('result-screen').style.display='flex';
         document.getElementById('res-score').innerText = total;
 
@@ -255,14 +269,22 @@
         document.getElementById('action-footer').style.display='none';
         document.getElementById('submit-btn').style.display='none';
         document.getElementById('exit-sol').style.display='block';
-        document.getElementById('ui-title').innerText = "Solution Analysis Mode";
+        document.getElementById('ui-title').innerText = "Analysis Mode";
         current = 1; checkSub(); render();
     }
 
-    function resetData() { localStorage.clear(); location.reload(); }
-    function clearAns() { document.getElementsByName('ans').forEach(r => r.checked = false); delete userAns[current]; delete status[current]; render(); }
-    function mark() { let sel = document.querySelector('input[name="ans"]:checked'); if(sel) userAns[current] = sel.value; status[current] = 'marked'; saveNext(); }
+    function resetData() {
+        if(confirm("Everything will be cleared! Continue?")) {
+            localStorage.clear();
+            location.reload();
+        }
+    }
+
+    function clearAns() { document.getElementsByName('ans').forEach(r => r.checked = false); delete userAns[current]; delete status[current]; sync(); updatePalette(); }
+    function mark() { let sel = document.querySelector('input[name="ans"]:checked'); if(sel) userAns[current] = sel.value; status[current] = 'marked'; sync(); saveNext(); }
     function jumpSub(s) { currentSub = s; current = subs[s][0]; render(); }
+
+    loadSavedData();
 </script>
 </body>
 </html>
