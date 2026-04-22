@@ -1,10 +1,80 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta http-equiv="refresh" content="0; url=https://examresources.vercel.app/home/">
-    <title>Redirecting...</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="1; url=https://examresources.vercel.app/home/">
+    <title>Redirecting to Exam Resources Dashboard</title>
+    <style>
+        body {
+            background-color: #0d1117; /* Dark background from your dashboard */
+            color: #c9d1d9; /* Light text color */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            flex-direction: column;
+        }
+
+        .container {
+            text-align: center;
+            padding: 2rem;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05); /* Slight white transparent overlay */
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        h1 {
+            color: #58a6ff; /* Accent blue color */
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        p {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .loader {
+            border: 4px solid #f3f3f3; /* Light grey */
+            border-top: 4px solid #58a6ff; /* Blue */
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        a {
+            color: #58a6ff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
-    <p>Redirecting you to <a href="https://examresources.vercel.app/home/">Home</a>...</p>
+    <div class="container">
+        <h1>[Exam Resources Dashboard](https://examresources.vercel.app/home/)</h1>
+        <p>Teleporting you in 1 second...</p>
+        <div class="loader"></div>
+        <p style="margin-top: 1rem; font-size: 0.9rem;">
+            If you are not redirected, [click here](https://examresources.vercel.app/home/).
+        </        <p style="margin-top: 1rem; font-size: 0.9rem;">
+            If you are not redirected, <a href="https://examresources.vercel.app/home/">click here</a>.
+        </p>
+    </div>
 </body>
 </html>
